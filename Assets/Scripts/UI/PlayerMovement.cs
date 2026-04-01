@@ -15,6 +15,9 @@ public class PlayerMovement : MonoBehaviour
     public SpriteRenderer visualRenderer;
     public Animator animator;
 
+    [Header("Control")]
+    public bool canMove = true;
+
     private Rigidbody2D rb;
     private float moveInput;
     private bool isGrounded;
@@ -26,9 +29,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        moveInput = Input.GetAxisRaw("Horizontal");
-
         CheckGround();
+
+        if (!canMove)
+        {
+            moveInput = 0f;
+            rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+            UpdateAnimator();
+            return;
+        }
+
+        moveInput = Input.GetAxisRaw("Horizontal");
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
@@ -41,6 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (!canMove) return;
         Move();
     }
 
@@ -56,7 +68,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void CheckGround()
     {
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
+        if (groundCheck == null) return;
+
+        isGrounded = Physics2D.OverlapCircle(
+            groundCheck.position,
+            groundCheckRadius,
+            groundLayer
+        );
     }
 
     private void FlipCharacter()
