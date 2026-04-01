@@ -209,24 +209,29 @@ public class IntroCutscene : MonoBehaviour
     }
 
     private IEnumerator MovePairTight(Transform elara, Transform morvath, Vector3 morvathTarget, float duration)
+{
+    float startMorvathX = morvath.position.x;
+    float fixedMorvathY = morvath.position.y;
+
+    float fixedElaraY = elara.position.y;
+    float elaraOffsetX = 0.16f;
+
+    float t = 0f;
+
+    while (t < duration)
     {
-        Vector3 morvathStart = morvath.position;
-        Vector3 tightOffset = new Vector3(0.16f, 0f, 0f);
+        float newX = Mathf.Lerp(startMorvathX, morvathTarget.x, t / duration);
 
-        float t = 0f;
+        morvath.position = new Vector3(newX, fixedMorvathY, morvath.position.z);
+        elara.position = new Vector3(newX + elaraOffsetX, fixedElaraY, elara.position.z);
 
-        while (t < duration)
-        {
-            morvath.position = Vector3.Lerp(morvathStart, morvathTarget, t / duration);
-            elara.position = morvath.position + tightOffset;
-
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        morvath.position = morvathTarget;
-        elara.position = morvath.position + tightOffset;
+        t += Time.deltaTime;
+        yield return null;
     }
+
+    morvath.position = new Vector3(morvathTarget.x, fixedMorvathY, morvath.position.z);
+    elara.position = new Vector3(morvathTarget.x + elaraOffsetX, fixedElaraY, elara.position.z);
+}
 
     private void LookAtNormal(Transform from, Transform to)
     {
